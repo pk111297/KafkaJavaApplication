@@ -1,15 +1,16 @@
-package com.kafka.project.firstExampleWithCallBack;
+package com.kafka.project.firstExampleKeys;
 
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.log4j.Logger;
 
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
-public class ProducerDemoWithCallback {
+public class ProducerDemoKeys {
 
-    private static Logger logger = Logger.getLogger(ProducerDemoWithCallback.class);
-    public static void produce(){
+    private static Logger logger = Logger.getLogger(ProducerDemoKeys.class);
+    public static void produce() throws ExecutionException, InterruptedException {
         logger.info("Producing Kafka Events");
         //For producing we need to create properties and then create producer and then send data
         Properties properties = new Properties();
@@ -46,10 +47,12 @@ public class ProducerDemoWithCallback {
                 }
             }
         });
-
         for(int i=0; i<10;++i){
+            String key = "Id_" +i;
             //create ProducerRecord
-            producerRecord = new ProducerRecord<>("second_topic","First Message from "+i);
+            producerRecord = new ProducerRecord<>("second_topic",key,"First Message from "+i);
+
+            logger.info("Key: " + key);
 
             //send data with callback function
             kafkaProducer.send(producerRecord, new Callback() {
@@ -65,10 +68,22 @@ public class ProducerDemoWithCallback {
                                 + "\nTOPIC: " + recordMetadata.topic() + "\nTIMESTAMP: " + recordMetadata.timestamp());
                     }
                 }
-            });
+            }).get();  //block to .send() to make it synchronous
         }
 
         kafkaProducer.flush();
         kafkaProducer.close();
     }
 }
+
+/*2022-07-07 17:38:10 INFO  ProducerDemoKeys:55 - Key: Id_0 PARTITION: 2
+2022-07-07 17:38:10 INFO  ProducerDemoKeys:55 - Key: Id_1 PARTITION: 1
+2022-07-07 17:38:10 INFO  ProducerDemoKeys:55 - Key: Id_2 PARTITION: 2
+2022-07-07 17:38:10 INFO  ProducerDemoKeys:55 - Key: Id_3 PARTITION: 0
+2022-07-07 17:38:10 INFO  ProducerDemoKeys:55 - Key: Id_4 PARTITION: 1
+2022-07-07 17:38:10 INFO  ProducerDemoKeys:55 - Key: Id_5 PARTITION: 2
+2022-07-07 17:38:10 INFO  ProducerDemoKeys:55 - Key: Id_6 PARTITION: 0
+2022-07-07 17:38:10 INFO  ProducerDemoKeys:55 - Key: Id_7 PARTITION: 2
+2022-07-07 17:38:10 INFO  ProducerDemoKeys:55 - Key: Id_8 PARTITION: 1
+2022-07-07 17:38:10 INFO  ProducerDemoKeys:55 - Key: Id_9 PARTITION: 0
+*/
