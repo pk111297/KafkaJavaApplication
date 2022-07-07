@@ -1,6 +1,7 @@
 package com.kafka.project;
 
 import com.kafka.project.firstExample.ProducerDemo;
+import com.kafka.project.firstExampleWithCallBack.ProducerDemoWithCallback;
 import org.apache.log4j.Logger;
 
 public class Main {
@@ -8,7 +9,8 @@ public class Main {
 
     public static void main(String[] args) {
         logger.info("Kafka Demo Application started");
-        ProducerDemo.produce();
+        //ProducerDemo.produce();
+        ProducerDemoWithCallback.produce();
         logger.info("Kafka Demo Application Completed");
     }
 }
